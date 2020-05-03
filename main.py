@@ -9,14 +9,17 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
 from tensorflow.keras.callbacks import TensorBoard
 
+
 # set to your directory
 datadir = "C:\\Users\\nickm\\PycharmProjects\\CatDogPredictor\\PetImages"
 categories = ['Dog', 'Cat']
 img_size = 50
 training_data = []
-load_data = Trueq
+load_data = True
+load_model = False
 x = [] # features
 y = [] # labels
+
 
 def load_training_data():
     global training_data, x, y
@@ -27,6 +30,7 @@ def load_training_data():
         x = pickle.load(file)
     with open("y_pickle", "rb") as file:
         y = pickle.load(file)
+
 
 def create_training_data():
     global training_data, x, y
@@ -56,7 +60,17 @@ def create_training_data():
     random.shuffle(training_data)
 
 
-# if you havent saved a model or training data create it all here
+# load data 
+if load_data:
+    load_training_data()
+
+
+# load model
+if load_model:
+    model = tf.keras.models.load_model('saved_model/saved_model.pb')
+
+
+# create data
 if not load_data:
     create_training_data()
 
@@ -64,7 +78,9 @@ if not load_data:
     x = np.array(x / 255.0)
     y = np.array(y)
 
-    # create our model
+
+# create model
+if not load_model:
     model = Sequential()
 
     model.add(Conv2D(64, (3, 3), input_shape=x.shape[1:]))
@@ -87,7 +103,4 @@ if not load_data:
 
     # save model
     model.save('saved_model/')
-else:
-    # load data and model
-    load_training_data()
-    model = tf.keras.models.load_model('saved_model/saved_model.pb')
+
